@@ -4,18 +4,35 @@ const connectDB = require('../config/db');
 const { getRazorpayClient } = require('../services/razorpayService');
 
 async function listDoctors(req, res, next) {
+  return res.render('appointmentpage', { doctors: [], directoryError: null });
+}
+
+async function apiListDoctors(req, res) {
   try {
     await connectDB();
     const doctors = await Doctor.find({ status: 'approved' })
       .sort({ createdAt: -1 })
-      .maxTimeMS(5000);
+      .maxTimeMS(5000)
+      .lean();
 
-    return res.render('appointmentpage', { doctors, directoryError: null });
+    return res.json({
+      success: true,
+      doctors: doctors.map((doctor) => ({
+        _id: doctor._id.toString(),
+        name: doctor.name,
+        degree: doctor.degree,
+        specialization: doctor.specialization,
+        experience: doctor.experience,
+        price: doctor.price,
+        image: doctor.image || '/uploads/home-doctor-male.jpg',
+        availableDays: doctor.availableDays || []
+      }))
+    });
   } catch (error) {
     console.error('Doctor directory error:', error.message);
-    return res.status(503).render('appointmentpage', {
-      doctors: [],
-      directoryError: 'Doctor list is temporarily unavailable. Check the MongoDB connection in Vercel, then refresh this page.'
+    return res.status(503).json({
+      success: false,
+      message: 'Doctor list is temporarily unavailable. Check the MongoDB connection in Vercel, then refresh this page.'
     });
   }
 }
@@ -124,6 +141,7 @@ async function viewBooking(req, res, next) {
 
 module.exports = {
   listDoctors,
+  apiListDoctors,
   showBookingForm,
   bookAppointment,
   myBookings,

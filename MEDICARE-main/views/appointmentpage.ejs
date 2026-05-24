@@ -42,6 +42,13 @@
       padding: 16px;
     }
 
+    #directoryAlert {
+      margin: 0 0 18px;
+      padding: 16px 18px;
+      border-color: #FCA5A5 !important;
+      font-weight: 800;
+    }
+
     .filters-grid {
       display: grid;
       grid-template-columns: minmax(260px, 1fr) 220px 170px;
@@ -159,9 +166,7 @@
 
     <%- include('partials/flash') %>
 
-    <% if (typeof directoryError !== 'undefined' && directoryError) { %>
-      <div class="flash flash-error"><%= directoryError %></div>
-    <% } %>
+    <div id="directoryAlert" class="alert alert-danger" role="alert" style="display: none;"></div>
 
     <section class="panel filters-panel">
       <div class="filters-grid">
@@ -193,10 +198,6 @@
       <span>Verified providers only</span>
     </div>
 
-    <% if (!doctors.length) { %>
-      <div class="empty-card">No approved doctors are available right now.</div>
-    <% } %>
-
     <section id="loadingGrid" class="loading-grid">
       <div class="loading-card"><div class="skeleton"></div><div class="skeleton line"></div><div class="skeleton line"></div><div class="skeleton line"></div></div>
       <div class="loading-card"><div class="skeleton"></div><div class="skeleton line"></div><div class="skeleton line"></div><div class="skeleton line"></div></div>
@@ -210,8 +211,8 @@
     </section>
 
     <div id="emptyState" class="empty-card">
-      <h2>No doctors found</h2>
-      <p>Try a different search term or clear the speciality filter.</p>
+      <h2 id="emptyStateTitle">No doctors found</h2>
+      <p id="emptyStateText">Try a different search term or clear the speciality filter.</p>
     </div>
   </main>
 
@@ -224,12 +225,30 @@
     const doctorGrid = document.getElementById('doctorGrid');
     const loadingGrid = document.getElementById('loadingGrid');
     const emptyState = document.getElementById('emptyState');
+    const emptyStateTitle = document.getElementById('emptyStateTitle');
+    const emptyStateText = document.getElementById('emptyStateText');
     const doctorCount = document.getElementById('doctorCount');
-    const cards = Array.from(document.querySelectorAll('.doctor-card'));
+    const directoryAlert = document.getElementById('directoryAlert');
+    let cards = Array.from(document.querySelectorAll('.doctor-card'));
     const chips = Array.from(document.querySelectorAll('.filter-chip'));
 
     function normalize(value) {
       return (value || '').toLowerCase().trim();
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[character]));
+    }
+
+    function setAlert(message) {
+      directoryAlert.textContent = message || '';
+      directoryAlert.style.display = message ? 'block' : 'none';
     }
 
     function specialtyMatches(actual, selected) {
@@ -243,10 +262,52 @@
       doctorGrid.style.display = isLoading ? 'none' : 'grid';
     }
 
+    function doctorCardTemplate(doctor) {
+      const name = escapeHtml(doctor.name || 'Doctor');
+      const degree = escapeHtml(doctor.degree || 'Medical professional');
+      const specialization = escapeHtml(doctor.specialization || 'General Physician');
+      const experience = escapeHtml(doctor.experience || 0);
+      const price = escapeHtml(doctor.price || 0);
+      const image = escapeHtml(doctor.image || '/uploads/home-doctor-male.jpg');
+      const id = encodeURIComponent(doctor._id || '');
+      const days = Array.isArray(doctor.availableDays) && doctor.availableDays.length
+        ? doctor.availableDays.map(escapeHtml).join(', ')
+        : 'Availability on request';
+      const search = escapeHtml(`${doctor.name || ''} ${doctor.specialization || ''} ${doctor.degree || ''} ${doctor.experience || ''}`.toLowerCase());
+      const specialty = escapeHtml(String(doctor.specialization || '').toLowerCase());
+
+      return `
+        <article class="doctor-card" data-search="${search}" data-specialty="${specialty}">
+          <div class="doctor-media">
+            <img src="${image}" alt="Dr. ${name}">
+            <span class="verified-badge">Verified</span>
+          </div>
+          <div class="doctor-card-body">
+            <div class="doctor-card-top">
+              <div>
+                <h2>Dr. ${name}</h2>
+                <p>${degree}</p>
+              </div>
+              <div class="rating-pill">4.8</div>
+            </div>
+            <div class="specialty-pill">${specialization}</div>
+            <div class="doctor-card-meta">
+              <span><strong>${experience}+</strong> years</span>
+              <span><strong>INR ${price}</strong> / min</span>
+            </div>
+            <p class="availability">${days}</p>
+            <a class="btn btn-primary btn-full" href="/book/${id}">Book Appointment</a>
+          </div>
+        </article>
+      `;
+    }
+
     function renderDoctors() {
       if (!cards.length) {
         doctorCount.textContent = 'No doctors available';
-        emptyState.style.display = 'none';
+        emptyStateTitle.textContent = 'No approved doctors available';
+        emptyStateText.textContent = 'Once MongoDB connects and approved doctors exist, they will appear here.';
+        emptyState.style.display = directoryAlert.style.display === 'none' ? 'block' : 'none';
         setLoading(false);
         return;
       }
@@ -258,6 +319,7 @@
         const selected = normalize(specialtyFilter.value);
         let visible = 0;
 
+        setAlert('');
         cards.forEach((card) => {
           const search = card.dataset.search || '';
           const specialty = card.dataset.specialty || '';
@@ -268,9 +330,41 @@
 
         chips.forEach((chip) => chip.classList.toggle('active', normalize(chip.dataset.specialty) === selected));
         doctorCount.textContent = `${visible} verified doctor${visible === 1 ? '' : 's'} found`;
+        emptyStateTitle.textContent = 'No doctors found';
+        emptyStateText.textContent = 'Try a different search term or clear the speciality filter.';
         emptyState.style.display = visible === 0 ? 'block' : 'none';
         setLoading(false);
       }, 180);
+    }
+
+    async function loadDoctors() {
+      setAlert('');
+      setLoading(true);
+      doctorCount.textContent = 'Loading doctors...';
+
+      try {
+        const response = await fetch('/api/doctors', {
+          headers: { Accept: 'application/json' },
+          cache: 'no-store'
+        });
+        const payload = await response.json().catch(() => ({}));
+
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.message || 'Unable to load doctors right now.');
+        }
+
+        const doctors = Array.isArray(payload.doctors) ? payload.doctors : [];
+        doctorGrid.innerHTML = doctors.map(doctorCardTemplate).join('');
+        cards = Array.from(document.querySelectorAll('.doctor-card'));
+        renderDoctors();
+      } catch (error) {
+        doctorGrid.innerHTML = '';
+        cards = [];
+        setLoading(false);
+        doctorCount.textContent = 'Doctor list error';
+        emptyState.style.display = 'none';
+        setAlert(error.message || 'Doctor list is temporarily unavailable. Please refresh this page.');
+      }
     }
 
     searchInput.addEventListener('input', renderDoctors);
@@ -287,7 +381,7 @@
       });
     });
 
-    renderDoctors();
+    loadDoctors();
   </script>
 </body>
 </html>

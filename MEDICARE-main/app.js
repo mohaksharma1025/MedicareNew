@@ -43,6 +43,7 @@ app.use(async (req, res, next) => {
     '/appointment',
     '/appointments',
     '/find-doctors',
+    '/api/doctors',
     '/admin/login',
     '/login',
     '/signup',
