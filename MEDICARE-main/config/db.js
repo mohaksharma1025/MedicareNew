@@ -15,7 +15,7 @@ async function connectDB() {
 
     const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/medicare';
     connectionPromise = mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 10000
+      serverSelectionTimeoutMS: 5000
     });
 
     await connectionPromise;

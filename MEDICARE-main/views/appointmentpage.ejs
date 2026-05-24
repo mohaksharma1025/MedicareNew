@@ -159,6 +159,10 @@
 
     <%- include('partials/flash') %>
 
+    <% if (typeof directoryError !== 'undefined' && directoryError) { %>
+      <div class="flash flash-error"><%= directoryError %></div>
+    <% } %>
+
     <section class="panel filters-panel">
       <div class="filters-grid">
         <input id="doctorSearch" type="search" placeholder="Search doctor, speciality, degree">
@@ -240,6 +244,13 @@
     }
 
     function renderDoctors() {
+      if (!cards.length) {
+        doctorCount.textContent = 'No doctors available';
+        emptyState.style.display = 'none';
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       window.clearTimeout(window.__doctorFilterTimer);
       window.__doctorFilterTimer = window.setTimeout(() => {

@@ -1,13 +1,22 @@
 const Appointment = require('../models/Appointment');
 const Doctor = require('../models/Doctor');
+const connectDB = require('../config/db');
 const { getRazorpayClient } = require('../services/razorpayService');
 
 async function listDoctors(req, res, next) {
   try {
-    const doctors = await Doctor.find({ status: 'approved' }).sort({ createdAt: -1 });
-    res.render('appointmentpage', { doctors });
+    await connectDB();
+    const doctors = await Doctor.find({ status: 'approved' })
+      .sort({ createdAt: -1 })
+      .maxTimeMS(5000);
+
+    return res.render('appointmentpage', { doctors, directoryError: null });
   } catch (error) {
-    next(error);
+    console.error('Doctor directory error:', error.message);
+    return res.status(503).render('appointmentpage', {
+      doctors: [],
+      directoryError: 'Doctor list is temporarily unavailable. Check the MongoDB connection in Vercel, then refresh this page.'
+    });
   }
 }
 

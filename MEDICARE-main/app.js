@@ -40,6 +40,9 @@ app.use((req, res, next) => {
 app.use(async (req, res, next) => {
   const dbFreeRoutes = new Set([
     '/',
+    '/appointment',
+    '/appointments',
+    '/find-doctors',
     '/admin/login',
     '/login',
     '/signup',
