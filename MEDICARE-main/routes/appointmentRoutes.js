@@ -4,7 +4,7 @@ const { isPatient } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.get('/appointment', appointmentController.listDoctors);
+router.get(['/appointment', '/appointments', '/find-doctors'], appointmentController.listDoctors);
 router.get('/book/:id', appointmentController.showBookingForm);
 router.post('/book-appointment', appointmentController.bookAppointment);
 router.get('/my-bookings', isPatient, appointmentController.myBookings);

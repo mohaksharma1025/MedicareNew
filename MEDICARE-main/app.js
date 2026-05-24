@@ -15,8 +15,6 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
-connectDB();
-
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -37,6 +35,31 @@ app.use((req, res, next) => {
   res.locals.currentDoctor = req.session.doctor || null;
   res.locals.isAdmin = Boolean(req.session.isAdmin);
   next();
+});
+
+app.use(async (req, res, next) => {
+  const dbFreeRoutes = new Set([
+    '/',
+    '/admin/login',
+    '/login',
+    '/signup',
+    '/doctor/login',
+    '/doctor/register',
+    '/contact',
+    '/services',
+    '/about'
+  ]);
+
+  if (dbFreeRoutes.has(req.path)) {
+    return next();
+  }
+
+  try {
+    await connectDB();
+    return next();
+  } catch (error) {
+    return next(error);
+  }
 });
 
 app.use('/', pageRoutes);
