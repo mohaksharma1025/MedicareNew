@@ -1,0 +1,23 @@
+<%
+  const sideActive = typeof activePage !== 'undefined' ? activePage : '';
+  const sideTitle = typeof sidebarTitle !== 'undefined' ? sidebarTitle : 'MediCare';
+  const sideRole = typeof sidebarRole !== 'undefined' ? sidebarRole : 'admin';
+%>
+<aside class="app-sidebar">
+  <a class="site-brand sidebar-brand" href="/">
+    <span class="site-brand-mark">M</span>
+    <span><%= sideTitle %></span>
+  </a>
+  <% if (sideRole === 'admin') { %>
+    <a class="<%= sideActive === 'doctors' ? 'active' : '' %>" href="/admin/dashboard?view=doctors">Doctor Data</a>
+    <a class="<%= sideActive === 'patients' ? 'active' : '' %>" href="/admin/dashboard?view=patients">Patient Data</a>
+    <a class="<%= sideActive === 'pending' ? 'active' : '' %>" href="/admin/doctors/pending">Pending Doctors</a>
+    <a class="<%= sideActive === 'approved' ? 'active' : '' %>" href="/admin/doctors/approved">Approved Doctors</a>
+    <a class="<%= sideActive === 'rejected' ? 'active' : '' %>" href="/admin/doctors/rejected">Rejected Doctors</a>
+    <a class="<%= sideActive === 'history' ? 'active' : '' %>" href="/admin/doctors/history">Doctor History</a>
+    <a href="/admin/logout">Logout</a>
+  <% } else { %>
+    <a class="<%= sideActive === 'doctor-dashboard' ? 'active' : '' %>" href="/doctor/dashboard">Dashboard</a>
+    <a href="/doctor/logout">Logout</a>
+  <% } %>
+</aside>

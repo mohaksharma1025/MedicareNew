@@ -1,0 +1,26 @@
+<article
+  class="doctor-card"
+  data-search="<%= `${doctor.name} ${doctor.specialization} ${doctor.degree} ${doctor.experience}`.toLowerCase() %>"
+  data-specialty="<%= (doctor.specialization || '').toLowerCase() %>"
+>
+  <div class="doctor-media">
+    <img src="<%= doctor.image %>" alt="Dr. <%= doctor.name %>">
+    <span class="verified-badge">Verified</span>
+  </div>
+  <div class="doctor-card-body">
+    <div class="doctor-card-top">
+      <div>
+        <h2>Dr. <%= doctor.name %></h2>
+        <p><%= doctor.degree %></p>
+      </div>
+      <div class="rating-pill">4.8</div>
+    </div>
+    <div class="specialty-pill"><%= doctor.specialization %></div>
+    <div class="doctor-card-meta">
+      <span><strong><%= doctor.experience %>+</strong> years</span>
+      <span><strong>INR <%= doctor.price %></strong> / min</span>
+    </div>
+    <p class="availability"><%= doctor.availableDays && doctor.availableDays.length ? doctor.availableDays.join(', ') : 'Availability on request' %></p>
+    <a class="btn btn-primary btn-full" href="/book/<%= doctor._id %>">Book Appointment</a>
+  </div>
+</article>

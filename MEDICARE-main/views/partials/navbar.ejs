@@ -1,0 +1,38 @@
+<%
+  const navUser = typeof currentUser !== 'undefined' ? currentUser : (typeof user !== 'undefined' ? user : null);
+  const active = typeof activePage !== 'undefined' ? activePage : '';
+%>
+<header class="site-header">
+  <nav class="site-nav">
+    <a class="site-brand" href="/" aria-label="MediCare home">
+      <span class="site-brand-mark">M</span>
+      <span>MediCare</span>
+    </a>
+
+    <input class="nav-toggle-input" type="checkbox" id="nav-toggle">
+    <label class="nav-toggle" for="nav-toggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+
+    <div class="site-nav-links">
+      <a class="<%= active === 'home' ? 'active' : '' %>" href="/">Home</a>
+      <a class="<%= active === 'appointments' ? 'active' : '' %>" href="/appointment">Find Doctors</a>
+      <a class="<%= active === 'services' ? 'active' : '' %>" href="/services">Services</a>
+      <a class="<%= active === 'contact' ? 'active' : '' %>" href="/contact">Contact</a>
+      <a href="/doctor/register">For Doctors</a>
+      <a href="/admin/login">Admin</a>
+    </div>
+
+    <div class="site-nav-actions">
+      <% if (navUser) { %>
+        <span class="nav-user">Hi, <%= navUser.name %></span>
+        <a class="btn btn-soft" href="/my-bookings">My Bookings</a>
+      <% } else { %>
+        <a class="btn btn-ghost" href="/login">Login</a>
+        <a class="btn btn-primary" href="/signup">Sign Up</a>
+      <% } %>
+    </div>
+  </nav>
+</header>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor History | MediCare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+  <link rel="stylesheet" href="/css/admin-ui.css">
+</head>
+<body class="admin-body">
+  <% const formatDateTime = (value) => value ? new Date(value).toLocaleString() : 'N/A'; %>
+  <div class="app-shell admin-shell">
+    <%- include('../partials/sidebar', { activePage: 'history', sidebarTitle: 'MediCare Admin', sidebarRole: 'admin' }) %>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1 class="admin-title">Doctor History</h1>
+          <p class="admin-subtitle">All doctors that were rejected or removed from the platform.</p>
+        </div>
+        <a class="btn btn-soft" href="/admin/dashboard?view=doctors">Back to Doctor Data</a>
+      </div>
+
+      <%- include('../partials/flash') %>
+
+      <section class="admin-panel">
+        <div class="admin-panel-header">
+          <div>
+            <h2>Rejected and Removed Doctors</h2>
+            <p>History is kept even after a doctor record is removed.</p>
+          </div>
+          <input id="historySearch" class="form-control admin-search" type="search" placeholder="Search history">
+        </div>
+        <div class="table-responsive">
+          <table class="table admin-table align-middle" id="historyTable">
+            <thead>
+              <tr>
+                <th>Doctor</th>
+                <th>Specialization</th>
+                <th>License</th>
+                <th>Action</th>
+                <th>Previous Status</th>
+                <th>Reason</th>
+                <th>Date</th>
+                <th>Documents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (!history.length) { %>
+                <tr><td class="admin-empty" colspan="8">No rejected or removed doctor history yet.</td></tr>
+              <% } %>
+              <% history.forEach(function(event) { %>
+                <tr>
+                  <td>
+                    <strong>Dr. <%= event.name %></strong>
+                    <p class="admin-small"><%= event.email %></p>
+                    <% if (event.phone) { %><p class="admin-small"><%= event.phone %></p><% } %>
+                  </td>
+                  <td><%= event.specialization || (event.snapshot && event.snapshot.specialization) || 'N/A' %></td>
+                  <td><%= event.medicalLicense || (event.snapshot && event.snapshot.medicalLicense) || 'N/A' %></td>
+                  <td><span class="admin-chip chip-<%= event.action %>"><%= event.action %></span></td>
+                  <td><%= event.statusBefore || 'N/A' %></td>
+                  <td><%= event.reason || 'N/A' %></td>
+                  <td><%= formatDateTime(event.actionAt) %></td>
+                  <td>
+                    <% if (event.snapshot && event.snapshot.document) { %>
+                      <a class="btn btn-soft btn-sm" href="<%= event.snapshot.document %>" target="_blank">Document</a>
+                    <% } else { %>
+                      <span class="admin-small">No document</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const historySearch = document.getElementById('historySearch');
+    const rows = Array.from(document.querySelectorAll('#historyTable tbody tr'));
+    historySearch.addEventListener('input', function () {
+      const query = historySearch.value.toLowerCase().trim();
+      rows.forEach(function (row) {
+        row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+      });
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

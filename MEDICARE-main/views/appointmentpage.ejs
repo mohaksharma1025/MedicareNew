@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Find Doctors | MediCare</title>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+  <style>
+    .directory-hero {
+      padding: 44px 0 20px;
+    }
+
+    .directory-hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: 24px;
+      align-items: end;
+    }
+
+    .directory-hero h1 {
+      font-size: clamp(2.4rem, 5vw, 4.6rem);
+      line-height: 1;
+      margin: 10px 0 12px;
+    }
+
+    .directory-hero p {
+      max-width: 680px;
+      font-size: 18px;
+      margin: 0;
+    }
+
+    .directory-note {
+      padding: 18px;
+      background: rgba(255,255,255,.84);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filters-panel {
+      margin: 18px 0 24px;
+      padding: 16px;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) 220px 170px;
+      gap: 12px;
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .filter-chip {
+      min-height: 36px;
+      border-radius: 999px !important;
+      border: 1px solid var(--border) !important;
+      background: #fff !important;
+      color: var(--dark) !important;
+      padding: 8px 12px;
+      box-shadow: none !important;
+    }
+
+    .filter-chip.active {
+      background: var(--dark) !important;
+      border-color: var(--dark) !important;
+      color: #fff !important;
+    }
+
+    .results-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .doctor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .loading-grid {
+      display: none;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .loading-card {
+      height: 380px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .loading-card .skeleton {
+      height: 150px;
+      margin-bottom: 16px;
+    }
+
+    .loading-card .line {
+      height: 12px;
+      margin: 10px 0;
+    }
+
+    #emptyState {
+      display: none;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 1020px) {
+      .directory-hero-grid,
+      .filters-grid,
+      .doctor-grid,
+      .loading-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .directory-note {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .directory-hero-grid,
+      .filters-grid,
+      .doctor-grid,
+      .loading-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/navbar', { activePage: 'appointments' }) %>
+
+  <main class="page-container">
+    <section class="directory-hero">
+      <div class="directory-hero-grid">
+        <div>
+          <div class="eyebrow">Verified doctor marketplace</div>
+          <h1>Find your specialist.</h1>
+          <p>Search approved doctors by speciality, name, degree, fee, or availability. Every listed doctor is reviewed by admin before accepting appointments.</p>
+        </div>
+        <aside class="directory-note">
+          <strong>Secure booking flow</strong>
+          <p style="margin: 6px 0 0;">Choose doctor, select time, pay online, and receive meeting plus receipt details.</p>
+        </aside>
+      </div>
+    </section>
+
+    <%- include('partials/flash') %>
+
+    <section class="panel filters-panel">
+      <div class="filters-grid">
+        <input id="doctorSearch" type="search" placeholder="Search doctor, speciality, degree">
+        <select id="specialtyFilter">
+          <option value="">All specialities</option>
+          <option value="cardiologist">Cardiologist</option>
+          <option value="pulmonologist">Pulmonologist</option>
+          <option value="dermatologist">Dermatologist</option>
+          <option value="dentist">Dentist</option>
+          <option value="neurologist">Neurologist</option>
+          <option value="orthopedic">Orthopedic</option>
+          <option value="general">General Physician</option>
+        </select>
+        <button id="clearFilters" type="button" class="btn btn-soft">Clear filters</button>
+      </div>
+      <div class="chip-row">
+        <button class="filter-chip active" type="button" data-specialty="">All</button>
+        <button class="filter-chip" type="button" data-specialty="cardiologist">Cardiology</button>
+        <button class="filter-chip" type="button" data-specialty="pulmonologist">Pulmonology</button>
+        <button class="filter-chip" type="button" data-specialty="dermatologist">Dermatology</button>
+        <button class="filter-chip" type="button" data-specialty="dentist">Dentistry</button>
+        <button class="filter-chip" type="button" data-specialty="general">General</button>
+      </div>
+    </section>
+
+    <div class="results-bar">
+      <span id="doctorCount">Loading doctors...</span>
+      <span>Verified providers only</span>
+    </div>
+
+    <% if (!doctors.length) { %>
+      <div class="empty-card">No approved doctors are available right now.</div>
+    <% } %>
+
+    <section id="loadingGrid" class="loading-grid">
+      <div class="loading-card"><div class="skeleton"></div><div class="skeleton line"></div><div class="skeleton line"></div><div class="skeleton line"></div></div>
+      <div class="loading-card"><div class="skeleton"></div><div class="skeleton line"></div><div class="skeleton line"></div><div class="skeleton line"></div></div>
+      <div class="loading-card"><div class="skeleton"></div><div class="skeleton line"></div><div class="skeleton line"></div><div class="skeleton line"></div></div>
+    </section>
+
+    <section id="doctorGrid" class="doctor-grid">
+      <% doctors.forEach(function(doctor) { %>
+        <%- include('partials/doctor-card', { doctor }) %>
+      <% }) %>
+    </section>
+
+    <div id="emptyState" class="empty-card">
+      <h2>No doctors found</h2>
+      <p>Try a different search term or clear the speciality filter.</p>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+
+  <script>
+    const searchInput = document.getElementById('doctorSearch');
+    const specialtyFilter = document.getElementById('specialtyFilter');
+    const clearFilters = document.getElementById('clearFilters');
+    const doctorGrid = document.getElementById('doctorGrid');
+    const loadingGrid = document.getElementById('loadingGrid');
+    const emptyState = document.getElementById('emptyState');
+    const doctorCount = document.getElementById('doctorCount');
+    const cards = Array.from(document.querySelectorAll('.doctor-card'));
+    const chips = Array.from(document.querySelectorAll('.filter-chip'));
+
+    function normalize(value) {
+      return (value || '').toLowerCase().trim();
+    }
+
+    function specialtyMatches(actual, selected) {
+      if (!selected) return true;
+      if (selected === 'general') return actual.includes('general') || actual.includes('physician');
+      return actual.includes(selected);
+    }
+
+    function setLoading(isLoading) {
+      loadingGrid.style.display = isLoading ? 'grid' : 'none';
+      doctorGrid.style.display = isLoading ? 'none' : 'grid';
+    }
+
+    function renderDoctors() {
+      setLoading(true);
+      window.clearTimeout(window.__doctorFilterTimer);
+      window.__doctorFilterTimer = window.setTimeout(() => {
+        const query = normalize(searchInput.value);
+        const selected = normalize(specialtyFilter.value);
+        let visible = 0;
+
+        cards.forEach((card) => {
+          const search = card.dataset.search || '';
+          const specialty = card.dataset.specialty || '';
+          const show = (!query || search.includes(query)) && specialtyMatches(specialty, selected);
+          card.style.display = show ? '' : 'none';
+          if (show) visible += 1;
+        });
+
+        chips.forEach((chip) => chip.classList.toggle('active', normalize(chip.dataset.specialty) === selected));
+        doctorCount.textContent = `${visible} verified doctor${visible === 1 ? '' : 's'} found`;
+        emptyState.style.display = visible === 0 ? 'block' : 'none';
+        setLoading(false);
+      }, 180);
+    }
+
+    searchInput.addEventListener('input', renderDoctors);
+    specialtyFilter.addEventListener('change', renderDoctors);
+    clearFilters.addEventListener('click', () => {
+      searchInput.value = '';
+      specialtyFilter.value = '';
+      renderDoctors();
+    });
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        specialtyFilter.value = chip.dataset.specialty;
+        renderDoctors();
+      });
+    });
+
+    renderDoctors();
+  </script>
+</body>
+</html>

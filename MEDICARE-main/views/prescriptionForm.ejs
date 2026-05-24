@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prescription | MediCare</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4faf9; color: #14313a; margin: 0; padding: 28px; }
+    .page { max-width: 1100px; margin: 0 auto; }
+    .panel { background: #fff; border: 1px solid #d7e9e7; border-radius: 8px; box-shadow: 0 10px 24px rgba(20,49,58,.07); padding: 24px; margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    label { display: block; font-weight: 700; margin-bottom: 7px; color: #29474d; }
+    input, select, textarea { width: 100%; min-height: 42px; border: 1px solid #bfd6d3; border-radius: 6px; padding: 9px 10px; font-size: 14px; }
+    textarea { min-height: 100px; resize: vertical; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+    th, td { padding: 10px; border-bottom: 1px solid #edf4f3; vertical-align: top; }
+    th { background: #f0f8f7; text-align: left; }
+    .btn { display: inline-block; background: #0f766e; color: #fff; border: none; padding: 10px 12px; border-radius: 6px; text-decoration: none; font-weight: 700; cursor: pointer; margin: 4px 4px 4px 0; }
+    .btn-light { background: #e8f6f4; color: #0f766e; }
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } table { min-width: 900px; } .table-wrap { overflow-x: auto; } }
+  </style>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+</head>
+<body>
+  <main class="page">
+    <a class="btn btn-light" href="/doctor/dashboard">Back to Dashboard</a>
+
+    <section class="panel">
+      <h1>Prescription Sheet</h1>
+      <p><strong>Doctor:</strong> Dr. <%= doctor.name %></p>
+      <p><strong>Patient:</strong> <%= appointment.patientName %> | <%= appointment.patientEmail %> | <%= appointment.patientPhone || 'N/A' %></p>
+      <p><strong>Appointment:</strong> <%= appointment.date %> at <%= appointment.time %></p>
+      <p><strong>Booking ID:</strong> <%= appointment._id %></p>
+      <p><strong>Payment ID:</strong> <%= appointment.paymentId || 'N/A' %></p>
+      <p><strong>Receipt:</strong> <%= appointment.receiptNumber || 'N/A' %></p>
+    </section>
+
+    <form method="POST" action="/doctor/appointments/<%= appointment._id %>/prescription">
+      <section class="panel">
+        <div class="grid">
+          <div>
+            <label for="diagnosis">Diagnosis</label>
+            <textarea id="diagnosis" name="diagnosis" required><%= appointment.prescription && appointment.prescription.diagnosis ? appointment.prescription.diagnosis : '' %></textarea>
+          </div>
+          <div>
+            <label for="notes">Doctor Notes</label>
+            <textarea id="notes" name="notes"><%= appointment.prescription && appointment.prescription.notes ? appointment.prescription.notes : '' %></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Medicines</h2>
+        <div class="table-wrap">
+          <table id="medicineTable">
+            <thead>
+              <tr>
+                <th>Medicine</th>
+                <th>Dosage</th>
+                <th>Frequency</th>
+                <th>Duration</th>
+                <th>Instructions</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% const medicines = appointment.prescription && appointment.prescription.medicines && appointment.prescription.medicines.length ? appointment.prescription.medicines : [{ name: '', dosage: '', frequency: 'OD', duration: '', instructions: '' }]; %>
+              <% medicines.forEach(function(medicine) { %>
+                <tr>
+                  <td><input name="medicineName" value="<%= medicine.name || '' %>" placeholder="Medicine name"></td>
+                  <td><input name="dosage" value="<%= medicine.dosage || '' %>" placeholder="e.g. 500mg"></td>
+                  <td>
+                    <select name="frequency">
+                      <% ['OD', 'BD', 'TDS', 'QID', 'SOS', 'HS', 'Other'].forEach(function(option) { %>
+                        <option value="<%= option %>" <%= medicine.frequency === option ? 'selected' : '' %>><%= option %></option>
+                      <% }) %>
+                    </select>
+                  </td>
+                  <td><input name="duration" value="<%= medicine.duration || '' %>" placeholder="e.g. 5 days"></td>
+                  <td><input name="instructions" value="<%= medicine.instructions || '' %>" placeholder="After food"></td>
+                  <td><button class="btn btn-light" type="button" onclick="removeRow(this)">Remove</button></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <button class="btn btn-light" type="button" onclick="addRow()">Add Medicine</button>
+        <button class="btn" type="submit">Save Prescription</button>
+      </section>
+    </form>
+  </main>
+
+  <script>
+    function addRow() {
+      const tbody = document.querySelector('#medicineTable tbody');
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><input name="medicineName" placeholder="Medicine name"></td>
+        <td><input name="dosage" placeholder="e.g. 500mg"></td>
+        <td>
+          <select name="frequency">
+            <option value="OD">OD</option>
+            <option value="BD">BD</option>
+            <option value="TDS">TDS</option>
+            <option value="QID">QID</option>
+            <option value="SOS">SOS</option>
+            <option value="HS">HS</option>
+            <option value="Other">Other</option>
+          </select>
+        </td>
+        <td><input name="duration" placeholder="e.g. 5 days"></td>
+        <td><input name="instructions" placeholder="After food"></td>
+        <td><button class="btn btn-light" type="button" onclick="removeRow(this)">Remove</button></td>
+      `;
+      tbody.appendChild(row);
+    }
+
+    function removeRow(button) {
+      const rows = document.querySelectorAll('#medicineTable tbody tr');
+      if (rows.length === 1) return;
+      button.closest('tr').remove();
+    }
+  </script>
+</body>
+</html>

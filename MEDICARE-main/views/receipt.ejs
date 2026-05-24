@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediCare Receipt</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4faf9; color: #14313a; padding: 32px; }
+    .receipt { max-width: 760px; margin: 0 auto; background: #fff; border: 1px solid #d7e9e7; border-radius: 8px; padding: 28px; }
+    .top { display: flex; justify-content: space-between; gap: 20px; border-bottom: 2px solid #0f766e; padding-bottom: 18px; margin-bottom: 22px; }
+    h1 { color: #0f766e; margin: 0 0 8px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+    td { padding: 10px 0; border-bottom: 1px solid #edf4f3; vertical-align: top; }
+    td:first-child { color: #60777d; font-weight: 700; width: 220px; }
+    .paid { display: inline-block; background: #dcfce7; color: #166534; padding: 6px 10px; border-radius: 999px; font-weight: 800; }
+    .actions { max-width: 760px; margin: 16px auto 0; display: flex; gap: 10px; justify-content: flex-end; }
+    .btn { background: #0f766e; color: #fff; text-decoration: none; border: none; border-radius: 6px; padding: 10px 14px; font-weight: 700; cursor: pointer; }
+    @media print { body { background: #fff; padding: 0; } .actions { display: none; } .receipt { border: none; } }
+  </style>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+</head>
+<body>
+  <section class="receipt">
+    <div class="top">
+      <div>
+        <h1>MediCare Receipt</h1>
+        <p>Receipt No: <strong><%= appointment.receiptNumber || appointment._id %></strong></p>
+      </div>
+      <div>
+        <span class="paid">PAID</span>
+      </div>
+    </div>
+
+    <table>
+      <tr><td>Patient Name</td><td><%= appointment.patientName %></td></tr>
+      <tr><td>Patient Email</td><td><%= appointment.patientEmail %></td></tr>
+      <tr><td>Patient Phone</td><td><%= appointment.patientPhone || 'N/A' %></td></tr>
+      <tr><td>Doctor</td><td>Dr. <%= appointment.doctorName %></td></tr>
+      <tr><td>Speciality</td><td><%= appointment.doctorSpecialization || 'See doctor profile' %></td></tr>
+      <tr><td>Appointment Date / Time</td><td><%= appointment.date %> at <%= appointment.time %></td></tr>
+      <tr><td>Meeting Link</td><td><a href="<%= appointment.meetingLink %>"><%= appointment.meetingLink || 'N/A' %></a></td></tr>
+      <tr><td>Amount Paid</td><td>INR <%= appointment.amount || 0 %></td></tr>
+      <tr><td>Payment ID</td><td><%= appointment.paymentId || 'N/A' %></td></tr>
+      <tr><td>Order ID</td><td><%= appointment.orderId || 'N/A' %></td></tr>
+      <tr><td>Paid At</td><td><%= appointment.paidAt ? appointment.paidAt.toLocaleString() : 'N/A' %></td></tr>
+    </table>
+  </section>
+
+  <% if (!download) { %>
+    <div class="actions">
+      <button class="btn" onclick="window.print()">Print / Save PDF</button>
+      <a class="btn" href="/payments/receipt/<%= appointment._id %>">Download Receipt</a>
+    </div>
+  <% } %>
+</body>
+</html>

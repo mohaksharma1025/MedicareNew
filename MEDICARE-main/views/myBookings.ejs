@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings | MediCare</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4faf9; color: #14313a; margin: 0; }
+    .topbar { background: #0f766e; color: #fff; padding: 18px 28px; }
+    .topbar a { color: #fff; margin-left: 18px; text-decoration: none; font-weight: 700; }
+    .page { max-width: 1200px; margin: 0 auto; padding: 28px; }
+    .panel { background: #fff; border: 1px solid #d7e9e7; border-radius: 8px; box-shadow: 0 10px 24px rgba(20,49,58,.07); overflow: hidden; }
+    .panel-header { padding: 20px; border-bottom: 1px solid #e7f0ee; }
+    table { width: 100%; border-collapse: collapse; min-width: 900px; }
+    th, td { text-align: left; padding: 13px 14px; border-bottom: 1px solid #e7f0ee; vertical-align: top; }
+    th { background: #f0f8f7; color: #29474d; font-size: 13px; text-transform: uppercase; }
+    .table-wrap { overflow-x: auto; }
+    .btn { display: inline-block; background: #0f766e; color: #fff; padding: 8px 10px; border-radius: 6px; text-decoration: none; font-weight: 700; margin: 3px 3px 3px 0; }
+    .btn-light { background: #e8f6f4; color: #0f766e; }
+    .badge { display: inline-block; border-radius: 999px; padding: 5px 9px; font-size: 12px; font-weight: 800; text-transform: uppercase; }
+    .paid, .confirmed { background: #dcfce7; color: #166534; }
+    .pending, .pending_payment { background: #fef3c7; color: #92400e; }
+    .failed, .cancelled { background: #ffe4e6; color: #be123c; }
+  </style>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+</head>
+<body>
+  <nav class="topbar">
+    <strong>MediCare Patient</strong>
+    <a href="/">Home</a>
+    <a href="/appointment">Book Appointment</a>
+    <a href="/logout">Logout</a>
+  </nav>
+
+  <main class="page">
+    <%- include('partials/flash') %>
+    <section class="panel">
+      <div class="panel-header">
+        <h1>My Bookings</h1>
+        <p>Appointments, receipts, meeting links, and prescriptions for <%= user.email %>.</p>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Doctor</th>
+              <th>Date / Time</th>
+              <th>Status</th>
+              <th>Payment</th>
+              <th>Meeting</th>
+              <th>Prescription</th>
+              <th>Payment ID</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (!appointments.length) { %>
+              <tr><td colspan="8" style="text-align:center; color:#60777d; padding:30px;">No bookings found.</td></tr>
+            <% } %>
+            <% appointments.forEach(function(appointment) { %>
+              <tr>
+                <td>Dr. <%= appointment.doctorName %></td>
+                <td><%= appointment.date %><br><%= appointment.time %></td>
+                <td><span class="badge <%= appointment.appointmentStatus %>"><%= appointment.appointmentStatus %></span></td>
+                <td><span class="badge <%= appointment.paymentStatus %>"><%= appointment.paymentStatus %></span><br><%= appointment.paymentId || '' %></td>
+                <td>
+                  <% if (appointment.meetingLink) { %>
+                    <a class="btn btn-light" href="<%= appointment.meetingLink %>" target="_blank">Join</a>
+                  <% } else { %>
+                    N/A
+                  <% } %>
+                </td>
+                <td>
+                  <% if (appointment.prescription && appointment.prescription.updatedAt) { %>
+                    <strong style="color:#166534;">Available</strong><br>
+                    <small>Updated <%= appointment.prescription.updatedAt.toLocaleString() %></small>
+                  <% } else { %>
+                    Not added yet
+                  <% } %>
+                </td>
+                <td><%= appointment.paymentId || 'N/A' %></td>
+                <td>
+                  <a class="btn" href="/my-bookings/<%= appointment._id %>"><%= appointment.prescription && appointment.prescription.updatedAt ? 'View Prescription' : 'View Booking' %></a>
+                  <% if (appointment.paymentStatus === 'paid') { %>
+                    <a class="btn btn-light" href="/payments/receipt/<%= appointment._id %>">Receipt</a>
+                  <% } %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

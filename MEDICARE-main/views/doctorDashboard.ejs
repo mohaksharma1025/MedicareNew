@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Dashboard | MediCare</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2faf9;
+      color: #14313a;
+    }
+
+    .topbar {
+      background: #0f766e;
+      color: #fff;
+      padding: 18px 28px;
+      box-shadow: 0 4px 18px rgba(15, 118, 110, 0.18);
+    }
+
+    .topbar-inner {
+      max-width: 1480px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .logout {
+      color: #0f766e;
+      background: #fff;
+      border-radius: 6px;
+      padding: 10px 14px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .page {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .alert {
+      border-radius: 6px;
+      padding: 13px 15px;
+      margin-bottom: 18px;
+    }
+
+    .alert-success {
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      color: #166534;
+    }
+
+    .alert-danger {
+      background: #ffe4e6;
+      border: 1px solid #fda4af;
+      color: #be123c;
+    }
+
+    .btn-close {
+      display: none;
+    }
+
+    .hero {
+      background: #fff;
+      border: 1px solid #d7e9e7;
+      border-radius: 8px;
+      box-shadow: 0 12px 28px rgba(20, 49, 58, 0.08);
+      padding: 24px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 22px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .doctor-photo {
+      width: 112px;
+      height: 112px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #d7e9e7;
+    }
+
+    .hero h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      color: #506c72;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .stat {
+      background: #fff;
+      border: 1px solid #d7e9e7;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 8px 22px rgba(20, 49, 58, 0.06);
+    }
+
+    .stat span {
+      display: block;
+      color: #60777d;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .stat strong {
+      font-size: 26px;
+      color: #0f766e;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #d7e9e7;
+      border-radius: 8px;
+      box-shadow: 0 8px 22px rgba(20, 49, 58, 0.06);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 18px;
+      border-bottom: 1px solid #e2efed;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .panel-header h2 {
+      font-size: 20px;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .detail {
+      border-bottom: 1px solid #eef5f4;
+      padding-bottom: 12px;
+    }
+
+    .detail:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .detail span {
+      display: block;
+      color: #60777d;
+      font-size: 13px;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .detail strong,
+    .detail p {
+      color: #14313a;
+      line-height: 1.45;
+      overflow-wrap: anywhere;
+    }
+
+    .doc-link {
+      display: inline-block;
+      border: 1px solid #0f766e;
+      color: #0f766e;
+      border-radius: 6px;
+      padding: 8px 10px;
+      text-decoration: none;
+      font-weight: 700;
+      margin: 4px 6px 4px 0;
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filters input,
+    .filters select {
+      min-height: 40px;
+      border: 1px solid #bfd6d3;
+      border-radius: 6px;
+      padding: 9px 10px;
+      color: #14313a;
+      outline: none;
+    }
+
+    .filters input {
+      min-width: 260px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1180px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 13px 14px;
+      border-bottom: 1px solid #e7f0ee;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    th {
+      background: #f0f8f7;
+      color: #29474d;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-weight: 800;
+      font-size: 12px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge-paid,
+    .badge-confirmed {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge-pending,
+    .badge-pending_payment {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge-failed,
+    .badge-cancelled {
+      background: #ffe4e6;
+      color: #be123c;
+    }
+
+    .empty {
+      text-align: center;
+      color: #60777d;
+      padding: 36px 16px;
+    }
+
+    @media (max-width: 1100px) {
+      .stats {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        padding: 18px;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .filters input,
+      .filters select {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+</head>
+<body>
+  <nav class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">MediCare Doctor Dashboard</div>
+      <a class="logout" href="/doctor/logout">Logout</a>
+    </div>
+  </nav>
+
+  <main class="page">
+    <%- include('partials/flash') %>
+
+    <section class="hero">
+      <img class="doctor-photo" src="<%= doctor.image %>" alt="<%= doctor.name %>">
+      <div>
+        <span class="status"><%= doctor.status %></span>
+        <h1>Welcome, Dr. <%= doctor.name %></h1>
+        <p><%= doctor.degree %> | <%= doctor.specialization %></p>
+        <div class="hero-meta">
+          <span><strong>Email:</strong> <%= doctor.email %></span>
+          <span><strong>Phone:</strong> <%= doctor.phone %></span>
+          <span><strong>Fee:</strong> INR <%= doctor.price %> / min</span>
+          <span><strong>Experience:</strong> <%= doctor.experience %> years</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat"><span>Total Appointments</span><strong><%= stats.totalAppointments %></strong></div>
+      <div class="stat"><span>Confirmed</span><strong><%= stats.confirmedAppointments %></strong></div>
+      <div class="stat"><span>Paid</span><strong><%= stats.paidAppointments %></strong></div>
+      <div class="stat"><span>Pending Payment</span><strong><%= stats.pendingPayments %></strong></div>
+      <div class="stat"><span>Failed Payment</span><strong><%= stats.failedPayments %></strong></div>
+      <div class="stat"><span>Total Revenue</span><strong>INR <%= stats.totalRevenue %></strong></div>
+    </section>
+
+    <section class="grid">
+      <aside class="panel">
+        <div class="panel-header">
+          <h2>Profile & Verification</h2>
+        </div>
+        <div class="panel-body detail-list">
+          <div class="detail">
+            <span>Approved At</span>
+            <strong><%= doctor.approvedAt ? doctor.approvedAt.toLocaleString() : 'Not available' %></strong>
+          </div>
+          <div class="detail">
+            <span>Aadhaar</span>
+            <strong><%= doctor.aadhar %></strong>
+          </div>
+          <div class="detail">
+            <span>Medical License</span>
+            <strong><%= doctor.medicalLicense %></strong>
+          </div>
+          <div class="detail">
+            <span>Available Days</span>
+            <p><%= doctor.availableDays && doctor.availableDays.length ? doctor.availableDays.join(', ') : 'Not set' %></p>
+          </div>
+          <div class="detail">
+            <span>Clinic / Address</span>
+            <p><%= doctor.address %></p>
+          </div>
+          <div class="detail">
+            <span>Uploaded Documents</span>
+            <a class="doc-link" href="<%= doctor.document %>" target="_blank">Verification Document</a>
+            <% if (doctor.certificates && doctor.certificates.length) { %>
+              <% doctor.certificates.forEach(function(file, index) { %>
+                <a class="doc-link" href="<%= file %>" target="_blank">Certificate <%= index + 1 %></a>
+              <% }) %>
+            <% } else { %>
+              <p>No certificates uploaded.</p>
+            <% } %>
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Appointments & Patient Details</h2>
+            <p style="color:#60777d; margin-top:4px;">Every booking, contact detail, payment status, and payment ID for your account.</p>
+          </div>
+          <div class="filters">
+            <input id="appointmentSearch" type="search" placeholder="Search patient, email, phone, payment ID">
+            <select id="paymentFilter">
+              <option value="">All payments</option>
+              <option value="paid">Paid</option>
+              <option value="pending">Pending</option>
+              <option value="failed">Failed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="appointmentsTable">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Contact</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Appointment</th>
+                <th>Payment</th>
+                <th>Amount</th>
+                <th>Payment ID</th>
+                <th>Order ID</th>
+                <th>Booked At</th>
+                <th>Prescription</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (!appointments.length) { %>
+                <tr data-payment="">
+                  <td colspan="10" class="empty">No patient appointments yet.</td>
+                </tr>
+              <% } %>
+
+              <% appointments.forEach(function(appointment) { %>
+                <tr data-payment="<%= appointment.paymentStatus %>">
+                  <td>
+                    <strong><%= appointment.patientName %></strong><br>
+                    <span style="color:#60777d;">Patient record</span>
+                  </td>
+                  <td>
+                    <strong>Email:</strong> <%= appointment.patientEmail %><br>
+                    <strong>Phone:</strong> <%= appointment.patientPhone || 'N/A' %>
+                  </td>
+                  <td><%= appointment.date %></td>
+                  <td><%= appointment.time %></td>
+                  <td>
+                    <span class="badge badge-<%= appointment.appointmentStatus %>"><%= appointment.appointmentStatus %></span>
+                  </td>
+                  <td>
+                    <span class="badge badge-<%= appointment.paymentStatus %>"><%= appointment.paymentStatus %></span>
+                  </td>
+                  <td><%= appointment.amount ? `INR ${appointment.amount}` : 'N/A' %></td>
+                  <td><%= appointment.paymentId || 'N/A' %></td>
+                  <td><%= appointment.orderId || 'N/A' %></td>
+                  <td><%= appointment.createdAt ? appointment.createdAt.toLocaleString() : 'N/A' %></td>
+                  <td>
+                    <a class="doc-link" href="/doctor/appointments/<%= appointment._id %>/prescription">
+                      <%= appointment.prescription && appointment.prescription.updatedAt ? 'Edit Prescription' : 'Add Prescription' %>
+                    </a>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const searchInput = document.getElementById('appointmentSearch');
+    const paymentFilter = document.getElementById('paymentFilter');
+    const rows = Array.from(document.querySelectorAll('#appointmentsTable tbody tr'));
+
+    function filterRows() {
+      const query = searchInput.value.toLowerCase().trim();
+      const payment = paymentFilter.value;
+
+      rows.forEach(function(row) {
+        const matchesSearch = row.innerText.toLowerCase().includes(query);
+        const matchesPayment = !payment || row.dataset.payment === payment;
+        row.style.display = matchesSearch && matchesPayment ? '' : 'none';
+      });
+    }
+
+    searchInput.addEventListener('input', filterRows);
+    paymentFilter.addEventListener('change', filterRows);
+  </script>
+</body>
+</html>

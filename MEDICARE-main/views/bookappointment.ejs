@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Appointment | MediConnect</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Your styles remain the same */
+  </style>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+</head>
+<body>
+
+  <h1>Book Appointment with Dr. <%= doctor.name %></h1>
+
+  <div class="form-container">
+    <form action="/book-appointment" method="POST">
+      <label for="patientEmail">Your Email:</label>
+      <input type="email" name="patientEmail" required>
+
+      <!-- Hidden fields for doctor info -->
+      <input type="hidden" name="doctorEmail" value="<%= doctor.email %>">
+      <input type="hidden" name="doctorName" value="<%= doctor.name %>">
+
+      <label for="patientName">Your Name:</label>
+      <input type="text" name="patientName" required>
+
+      <label for="appointmentDate">Appointment Date:</label>
+      <input type="date" name="appointmentDate" required>
+
+      <label for="appointmentTime">Appointment Time:</label>
+      <input type="time" name="appointmentTime" required>
+
+      <button type="submit" class="submit-btn">Book Appointment</button>
+    </form>
+  </div>
+
+</body>
+</html>

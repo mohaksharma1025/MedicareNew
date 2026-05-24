@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About MediCare</title>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+  <style>
+    .simple-nav { max-width: 1080px; margin: 0 auto; padding: 22px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .simple-nav strong { font-size: 24px; }
+    .page-shell { max-width: 980px; margin: 34px auto; padding: 0 24px; }
+    .hero-card { padding: 42px; }
+    .hero-card h1 { font-size: clamp(2rem, 4vw, 4rem); margin-bottom: 14px; }
+    .hero-card p { color: var(--mc-muted); font-size: 18px; }
+    .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 20px; }
+    .info-box { padding: 20px; background: #fff; border: 1px solid var(--mc-border); border-radius: 8px; box-shadow: var(--mc-shadow-sm); }
+    @media (max-width: 760px) { .info-grid { grid-template-columns: 1fr; } .simple-nav { flex-direction: column; gap: 12px; align-items: flex-start; } }
+  </style>
+</head>
+<body>
+  <nav class="mc-nav">
+    <div class="simple-nav">
+      <strong>MediCare</strong>
+      <a class="btn btn-light" href="/">Home</a>
+    </div>
+  </nav>
+  <main class="page-shell">
+    <section class="panel hero-card">
+      <div class="eyebrow">About Us</div>
+      <h1>Healthcare access, made simpler.</h1>
+      <p>MediCare connects patients with verified doctors, secure online payments, appointment receipts, meeting access, and prescription follow-up in one focused platform.</p>
+    </section>
+    <section class="info-grid">
+      <article class="info-box">
+        <h2>Verified Care</h2>
+        <p>Doctors go through admin verification before they can login and accept appointments.</p>
+      </article>
+      <article class="info-box">
+        <h2>Clear Records</h2>
+        <p>Patients can return to their booking history for receipts, meeting links, and prescriptions.</p>
+      </article>
+      <article class="info-box">
+        <h2>Practical Workflow</h2>
+        <p>Admins, doctors, and patients each get dedicated dashboards for their part of the care journey.</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

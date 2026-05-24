@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Appointments | MediCare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+  <link rel="stylesheet" href="/css/admin-ui.css">
+</head>
+<body class="admin-body">
+  <%
+    const formatDateTime = (value) => value ? new Date(value).toLocaleString() : 'N/A';
+    const formatMoney = (value) => `INR ${Number(value || 0).toLocaleString('en-IN')}`;
+    const activeStatus = doctor.status || 'pending';
+  %>
+  <div class="app-shell admin-shell">
+    <%- include('../partials/sidebar', { activePage: activeStatus, sidebarTitle: 'MediCare Admin', sidebarRole: 'admin' }) %>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1 class="admin-title">Doctor Appointments</h1>
+          <p class="admin-subtitle">Patient bookings connected to this doctor.</p>
+        </div>
+        <a class="btn btn-soft" href="/admin/doctors/<%= activeStatus %>">Back to <%= activeStatus %> doctors</a>
+      </div>
+
+      <%- include('../partials/flash') %>
+
+      <section class="admin-panel mb-3">
+        <div class="admin-panel-header">
+          <div class="admin-doctor-summary">
+            <img class="admin-photo" src="<%= doctor.image %>" alt="<%= doctor.name %>">
+            <div>
+              <h2>Dr. <%= doctor.name %></h2>
+              <p><%= doctor.degree %> | <%= doctor.specialization %> | <%= doctor.experience %> years</p>
+            </div>
+          </div>
+          <span class="admin-chip chip-<%= activeStatus %>"><%= activeStatus %></span>
+        </div>
+        <div class="p-3">
+          <div class="row g-3">
+            <div class="col-md-4"><strong>Email</strong><p class="admin-small"><%= doctor.email %></p></div>
+            <div class="col-md-4"><strong>Phone</strong><p class="admin-small"><%= doctor.phone %></p></div>
+            <div class="col-md-4"><strong>Consultation Fee</strong><p class="admin-small"><%= formatMoney(doctor.price) %>/min</p></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="admin-panel">
+        <div class="admin-panel-header">
+          <div>
+            <h2>Appointments & Patient Details</h2>
+            <p>Search all appointments booked with this doctor.</p>
+          </div>
+          <input id="appointmentSearch" class="form-control admin-search" type="search" placeholder="Search appointments">
+        </div>
+
+        <div class="table-responsive">
+          <table class="table admin-table align-middle" id="appointmentTable">
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Phone</th>
+                <th>Date</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Amount</th>
+                <th>Payment ID</th>
+                <th>Booked At</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (!appointments.length) { %>
+                <tr><td colspan="8" class="admin-empty">No appointments found for this doctor.</td></tr>
+              <% } %>
+              <% appointments.forEach(function(appointment) { %>
+                <tr>
+                  <td>
+                    <strong><%= appointment.patientName %></strong>
+                    <p class="admin-small"><%= appointment.patientEmail %></p>
+                  </td>
+                  <td><%= appointment.patientPhone || 'N/A' %></td>
+                  <td><%= appointment.date %> at <%= appointment.time %></td>
+                  <td><span class="admin-chip chip-<%= appointment.paymentStatus %>"><%= appointment.paymentStatus %></span></td>
+                  <td><span class="admin-chip chip-<%= appointment.appointmentStatus %>"><%= appointment.appointmentStatus %></span></td>
+                  <td><%= appointment.amount ? formatMoney(appointment.amount) : 'N/A' %></td>
+                  <td><%= appointment.paymentId || 'N/A' %></td>
+                  <td><%= formatDateTime(appointment.createdAt) %></td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('appointmentSearch');
+    const rows = Array.from(document.querySelectorAll('#appointmentTable tbody tr'));
+
+    searchInput.addEventListener('input', function () {
+      const query = searchInput.value.toLowerCase().trim();
+      rows.forEach(function (row) {
+        row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+      });
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

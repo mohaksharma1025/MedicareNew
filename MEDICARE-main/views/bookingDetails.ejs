@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Details | MediCare</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4faf9; color: #14313a; margin: 0; padding: 28px; }
+    .page { max-width: 1000px; margin: 0 auto; }
+    .panel { background: #fff; border: 1px solid #d7e9e7; border-radius: 8px; box-shadow: 0 10px 24px rgba(20,49,58,.07); padding: 24px; margin-bottom: 18px; }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .item { border-bottom: 1px solid #edf4f3; padding-bottom: 12px; }
+    .item span { display: block; color: #60777d; font-size: 13px; font-weight: 700; margin-bottom: 5px; }
+    .btn { display: inline-block; background: #0f766e; color: #fff; padding: 10px 12px; border-radius: 6px; text-decoration: none; font-weight: 700; margin: 4px 4px 4px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid #edf4f3; }
+    th { background: #f0f8f7; }
+    @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+</head>
+<body>
+  <main class="page">
+    <a href="/my-bookings" class="btn">Back to My Bookings</a>
+
+    <section class="panel">
+      <h1>Booking Details</h1>
+      <div class="grid">
+        <div class="item"><span>Doctor</span>Dr. <%= appointment.doctorName %></div>
+        <div class="item"><span>Date / Time</span><%= appointment.date %> at <%= appointment.time %></div>
+        <div class="item"><span>Patient</span><%= appointment.patientName %></div>
+        <div class="item"><span>Payment</span><%= appointment.paymentStatus %> | <%= appointment.paymentId || 'N/A' %></div>
+        <div class="item"><span>Booking ID</span><%= appointment._id %></div>
+        <div class="item"><span>Receipt</span><%= appointment.receiptNumber || 'N/A' %></div>
+        <div class="item"><span>Meeting Link</span><a href="<%= appointment.meetingLink %>" target="_blank"><%= appointment.meetingLink || 'N/A' %></a></div>
+      </div>
+      <% if (appointment.paymentStatus === 'paid') { %>
+        <a class="btn" href="/payments/receipt/<%= appointment._id %>">Download Receipt</a>
+      <% } %>
+    </section>
+
+    <section class="panel">
+      <h2>Prescription</h2>
+      <% if (appointment.prescription && appointment.prescription.updatedAt) { %>
+        <p><strong>Diagnosis:</strong> <%= appointment.prescription.diagnosis || 'N/A' %></p>
+        <p><strong>Notes:</strong> <%= appointment.prescription.notes || 'N/A' %></p>
+        <p><strong>Updated:</strong> <%= appointment.prescription.updatedAt.toLocaleString() %></p>
+        <table>
+          <thead>
+            <tr>
+              <th>Medicine</th>
+              <th>Dosage</th>
+              <th>Frequency</th>
+              <th>Duration</th>
+              <th>Instructions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% appointment.prescription.medicines.forEach(function(medicine) { %>
+              <tr>
+                <td><%= medicine.name %></td>
+                <td><%= medicine.dosage %></td>
+                <td><%= medicine.frequency %></td>
+                <td><%= medicine.duration %></td>
+                <td><%= medicine.instructions %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      <% } else { %>
+        <p>No prescription has been added by the doctor yet.</p>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>

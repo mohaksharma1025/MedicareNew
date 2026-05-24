@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Successful | MediCare</title>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+  <style>
+    .page-shell { min-height: 100vh; display: grid; place-items: center; padding: 28px; }
+    .success-panel { width: min(560px, 100%); padding: 34px; text-align: center; }
+    .success-panel h1 { font-size: 34px; margin-bottom: 10px; }
+    .success-panel p { color: var(--mc-muted); margin-bottom: 22px; }
+    .actions { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <section class="panel success-panel">
+      <div class="eyebrow">Signed In</div>
+      <h1>Welcome, <%= user.name %>.</h1>
+      <p>You can now book appointments and view your booking history.</p>
+      <div class="actions">
+        <a class="btn" href="/appointment">Book Appointment</a>
+        <a class="btn btn-light" href="/my-bookings">My Bookings</a>
+        <a class="btn btn-light" href="/">Home</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

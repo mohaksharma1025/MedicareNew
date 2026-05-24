@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | MediCare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+  <link rel="stylesheet" href="/css/admin-ui.css">
+</head>
+<body class="admin-body">
+  <%
+    const formatDate = (value) => value ? new Date(value).toLocaleDateString() : 'N/A';
+    const formatDateTime = (value) => value ? new Date(value).toLocaleString() : 'N/A';
+    const formatMoney = (value) => `INR ${Number(value || 0).toLocaleString('en-IN')}`;
+    const doctorView = activeView === 'doctors';
+  %>
+  <div class="app-shell admin-shell">
+    <%- include('../partials/sidebar', { activePage: doctorView ? 'doctors' : 'patients', sidebarTitle: 'MediCare Admin', sidebarRole: 'admin' }) %>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1 class="admin-title">Admin Dashboard</h1>
+          <p class="admin-subtitle">Switch between platform doctor data and patient data.</p>
+        </div>
+        <nav class="admin-switch" aria-label="Admin dashboard views">
+          <a class="<%= doctorView ? 'active' : '' %>" href="/admin/dashboard?view=doctors">Doctor Data</a>
+          <a class="<%= !doctorView ? 'active' : '' %>" href="/admin/dashboard?view=patients">Patient Data</a>
+        </nav>
+      </div>
+
+      <%- include('../partials/flash') %>
+
+      <% if (doctorView) { %>
+        <section class="admin-stat-grid" aria-label="Doctor statistics">
+          <article class="admin-stat-card"><span>Total Doctors</span><strong><%= stats.totalDoctors %></strong></article>
+          <article class="admin-stat-card"><span>Pending Review</span><strong><%= stats.pendingDoctors %></strong></article>
+          <article class="admin-stat-card"><span>Approved</span><strong><%= stats.approvedDoctors %></strong></article>
+          <article class="admin-stat-card"><span>Rejected</span><strong><%= stats.rejectedDoctors %></strong></article>
+          <article class="admin-stat-card"><span>Removed History</span><strong><%= stats.removedDoctors %></strong></article>
+          <article class="admin-stat-card"><span>Total Appointments</span><strong><%= stats.totalAppointments %></strong></article>
+          <article class="admin-stat-card"><span>Confirmed Visits</span><strong><%= stats.confirmedAppointments %></strong></article>
+          <article class="admin-stat-card"><span>Paid Visits</span><strong><%= stats.paidAppointments %></strong></article>
+        </section>
+
+        <div class="admin-action-row">
+          <a class="btn btn-soft" href="/admin/doctors/pending">Review Pending</a>
+          <a class="btn btn-soft" href="/admin/doctors/approved">Approved Doctors</a>
+          <a class="btn btn-soft" href="/admin/doctors/rejected">Rejected Doctors</a>
+          <a class="btn btn-primary" href="/admin/doctors/history">Doctor History</a>
+        </div>
+
+        <section class="admin-grid-2">
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <div>
+                <h2>Pending Doctor Reviews</h2>
+                <p>Newest submitted profiles waiting for admin action.</p>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table admin-table align-middle">
+                <thead>
+                  <tr>
+                    <th>Doctor</th>
+                    <th>Specialization</th>
+                    <th>Fee</th>
+                    <th>Submitted</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (!pendingDoctorList.length) { %>
+                    <tr><td class="admin-empty" colspan="5">No pending doctor profiles.</td></tr>
+                  <% } %>
+                  <% pendingDoctorList.forEach(function(doctor) { %>
+                    <tr>
+                      <td>
+                        <div class="admin-doctor-summary">
+                          <img class="admin-photo" src="<%= doctor.image %>" alt="<%= doctor.name %>">
+                          <div>
+                            <h3>Dr. <%= doctor.name %></h3>
+                            <p><%= doctor.email %></p>
+                          </div>
+                        </div>
+                      </td>
+                      <td><%= doctor.specialization %></td>
+                      <td><%= formatMoney(doctor.price) %>/min</td>
+                      <td><%= formatDate(doctor.createdAt) %></td>
+                      <td>
+                        <div class="admin-actions">
+                          <form method="POST" action="/admin/approve/<%= doctor._id %>">
+                            <button class="btn btn-success btn-sm" type="submit">Approve</button>
+                          </form>
+                          <a class="btn btn-danger btn-sm" href="/admin/reject/<%= doctor._id %>">Reject</a>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <div>
+                <h2>Recent Doctor History</h2>
+                <p>Rejected and removed doctor records.</p>
+              </div>
+              <a class="btn btn-soft btn-sm" href="/admin/doctors/history">View All</a>
+            </div>
+            <div class="table-responsive">
+              <table class="table admin-table align-middle">
+                <thead>
+                  <tr>
+                    <th>Doctor</th>
+                    <th>Action</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (!recentDoctorHistory.length) { %>
+                    <tr><td class="admin-empty" colspan="3">No history records yet.</td></tr>
+                  <% } %>
+                  <% recentDoctorHistory.forEach(function(event) { %>
+                    <tr>
+                      <td>
+                        <strong>Dr. <%= event.name %></strong>
+                        <p class="admin-small"><%= event.email %></p>
+                      </td>
+                      <td><span class="admin-chip chip-<%= event.action %>"><%= event.action %></span></td>
+                      <td><%= formatDateTime(event.actionAt) %></td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      <% } else { %>
+        <section class="admin-stat-grid" aria-label="Patient statistics">
+          <article class="admin-stat-card"><span>Total Registered</span><strong><%= stats.totalPatients %></strong></article>
+          <article class="admin-stat-card"><span>Total Appointments</span><strong><%= stats.totalAppointments %></strong></article>
+          <article class="admin-stat-card"><span>Pending Appointments</span><strong><%= stats.pendingAppointments %></strong></article>
+          <article class="admin-stat-card"><span>Confirmed Appointments</span><strong><%= stats.confirmedAppointments %></strong></article>
+          <article class="admin-stat-card"><span>Paid Appointments</span><strong><%= stats.paidAppointments %></strong></article>
+          <article class="admin-stat-card"><span>Failed Payments</span><strong><%= stats.failedPayments %></strong></article>
+          <article class="admin-stat-card"><span>Cancelled</span><strong><%= stats.cancelledAppointments %></strong></article>
+          <article class="admin-stat-card"><span>Total Revenue</span><strong><%= formatMoney(stats.totalRevenue) %></strong></article>
+        </section>
+
+        <section class="admin-panel">
+          <div class="admin-panel-header">
+            <div>
+              <h2>Patient Records</h2>
+              <p>Registered patients with appointment and payment activity.</p>
+            </div>
+            <input id="patientSearch" class="form-control admin-search" type="search" placeholder="Search patients">
+          </div>
+          <div class="table-responsive">
+            <table class="table admin-table align-middle" id="patientTable">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Age / Gender</th>
+                  <th>Registered</th>
+                  <th>Total</th>
+                  <th>Pending</th>
+                  <th>Paid</th>
+                  <th>Spent</th>
+                  <th>Latest Appointment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!patientRows.length) { %>
+                  <tr><td class="admin-empty" colspan="8">No registered patients found.</td></tr>
+                <% } %>
+                <% patientRows.forEach(function(row) { %>
+                  <tr>
+                    <td>
+                      <strong><%= row.user.name || 'Unnamed Patient' %></strong>
+                      <p class="admin-small"><%= row.user.email %></p>
+                    </td>
+                    <td><%= row.user.age || 'N/A' %> / <%= row.user.gender || 'N/A' %></td>
+                    <td><%= formatDate(row.registeredAt) %></td>
+                    <td><%= row.totalAppointments %></td>
+                    <td><span class="admin-chip chip-pending"><%= row.pendingAppointments %></span></td>
+                    <td><span class="admin-chip chip-paid"><%= row.paidAppointments %></span></td>
+                    <td><%= formatMoney(row.totalSpent) %></td>
+                    <td>
+                      <% if (row.latestAppointment) { %>
+                        <strong>Dr. <%= row.latestAppointment.doctorName %></strong>
+                        <p class="admin-small"><%= row.latestAppointment.date %> at <%= row.latestAppointment.time %></p>
+                      <% } else { %>
+                        <span class="admin-small">No appointments</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="admin-panel">
+          <div class="admin-panel-header">
+            <div>
+              <h2>Recent Appointments</h2>
+              <p>Latest booking activity across all patients.</p>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table admin-table align-middle">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Doctor</th>
+                  <th>Date</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!recentAppointments.length) { %>
+                  <tr><td class="admin-empty" colspan="6">No appointment records found.</td></tr>
+                <% } %>
+                <% recentAppointments.forEach(function(appointment) { %>
+                  <tr>
+                    <td>
+                      <strong><%= appointment.patientName %></strong>
+                      <p class="admin-small"><%= appointment.patientEmail %></p>
+                    </td>
+                    <td>Dr. <%= appointment.doctorName %></td>
+                    <td><%= appointment.date %> at <%= appointment.time %></td>
+                    <td><span class="admin-chip chip-<%= appointment.paymentStatus %>"><%= appointment.paymentStatus %></span></td>
+                    <td><span class="admin-chip chip-<%= appointment.appointmentStatus %>"><%= appointment.appointmentStatus %></span></td>
+                    <td><%= appointment.amount ? formatMoney(appointment.amount) : 'N/A' %></td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      <% } %>
+    </main>
+  </div>
+
+  <script>
+    const patientSearch = document.getElementById('patientSearch');
+    if (patientSearch) {
+      const rows = Array.from(document.querySelectorAll('#patientTable tbody tr'));
+      patientSearch.addEventListener('input', function () {
+        const query = patientSearch.value.toLowerCase().trim();
+        rows.forEach(function (row) {
+          row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+        });
+      });
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

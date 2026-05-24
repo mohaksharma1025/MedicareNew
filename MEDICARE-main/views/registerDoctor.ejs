@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Registration | MediCare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #eef7f6; color: #123; }
+    .page-wrap { max-width: 980px; margin: 36px auto; }
+    .panel { background: #fff; border: 1px solid #dcebea; border-radius: 8px; box-shadow: 0 14px 35px rgba(18, 59, 64, .08); }
+    .panel-header { background: #0f766e; color: #fff; border-radius: 8px 8px 0 0; padding: 24px; }
+    .panel-header p { color: rgba(255, 255, 255, .86) !important; }
+    .form-label { font-weight: 600; color: #1f3f45; }
+    .btn-med { background: #0f766e; color: #fff; }
+    .btn-med:hover { background: #115e59; color: #fff; }
+  </style>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+</head>
+<body>
+  <main class="page-wrap px-3">
+    <%- include('partials/flash') %>
+    <section class="panel">
+      <div class="panel-header">
+        <h1 class="h3 mb-1">Register as a Doctor</h1>
+        <p class="mb-0">Your profile will be reviewed by the MediCare admin team before login is enabled.</p>
+      </div>
+      <form class="p-4" method="POST" action="/doctor/register" enctype="multipart/form-data">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Full Name</label>
+            <input class="form-control" type="text" name="name" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input class="form-control" type="email" name="email" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Password</label>
+            <input class="form-control" type="password" name="password" minlength="6" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Phone Number</label>
+            <input class="form-control" type="text" name="phone" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Aadhaar Number</label>
+            <input class="form-control" type="text" name="aadhar" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Medical License Number</label>
+            <input class="form-control" type="text" name="medicalLicense" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Degree</label>
+            <input class="form-control" type="text" name="degree" placeholder="MBBS, MD, BDS" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Specialization</label>
+            <input class="form-control" type="text" name="specialization" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Experience (years)</label>
+            <input class="form-control" type="number" name="experience" min="0" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Consultation Price (INR/min)</label>
+            <input class="form-control" type="number" name="price" min="1" required>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Address</label>
+            <textarea class="form-control" name="address" rows="3" required></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Available Days</label>
+            <input class="form-control" type="text" name="availableDays" placeholder="Monday, Wednesday, Friday" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Profile Photo</label>
+            <input class="form-control" type="file" name="image" accept="image/*" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Primary Verification Document</label>
+            <input class="form-control" type="file" name="document" accept=".pdf,image/*" required>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Certificates</label>
+            <input class="form-control" type="file" name="certificates" accept=".pdf,image/*" multiple>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button class="btn btn-med px-4" type="submit">Submit for Verification</button>
+          <a class="btn btn-outline-secondary" href="/doctor/login">Doctor Login</a>
+          <a class="btn btn-link" href="/">Home</a>
+        </div>
+      </form>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

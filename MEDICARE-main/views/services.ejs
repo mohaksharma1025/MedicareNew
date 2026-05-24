@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services | MediCare</title>
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+  <style>
+    .page-shell { max-width: 1120px; margin: 34px auto; padding: 0 24px; }
+    .top-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 22px; }
+    .service-hero { padding: 34px; margin-bottom: 18px; }
+    .service-hero h1 { font-size: clamp(2rem, 4vw, 3.6rem); margin-bottom: 10px; }
+    .service-hero p { color: var(--mc-muted); max-width: 760px; font-size: 18px; }
+    .service-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .service { min-height: 150px; padding: 20px; background: #fff; border: 1px solid var(--mc-border); border-radius: 8px; box-shadow: var(--mc-shadow-sm); }
+    .service p { color: var(--mc-muted); margin: 8px 0 0; }
+    @media (max-width: 860px) { .service-grid { grid-template-columns: 1fr; } .top-row { flex-direction: column; align-items: flex-start; } }
+  </style>
+</head>
+<body>
+  <main class="page-shell">
+    <div class="top-row">
+      <strong class="mc-brand"><span class="brand-mark">M</span>MediCare</strong>
+      <a class="btn btn-light" href="/">Home</a>
+    </div>
+    <section class="panel service-hero">
+      <div class="eyebrow">Services</div>
+      <h1>Care workflows for patients and doctors.</h1>
+      <p>From verified doctor discovery to paid appointments, receipts, meeting links, and prescriptions, MediCare keeps the consultation process organized.</p>
+    </section>
+    <section class="service-grid">
+      <article class="service"><h2>Doctor Appointments</h2><p>Book approved doctors by specialization and consultation fee.</p></article>
+      <article class="service"><h2>Online Consultation</h2><p>Join the generated meeting link at the scheduled time.</p></article>
+      <article class="service"><h2>Secure Payments</h2><p>Razorpay verification confirms appointments only after successful payment.</p></article>
+      <article class="service"><h2>Patient Bookings</h2><p>Patients can view history, receipts, meeting links, and prescriptions.</p></article>
+      <article class="service"><h2>Doctor Dashboard</h2><p>Doctors manage patient appointments and add prescription sheets.</p></article>
+      <article class="service"><h2>Admin Verification</h2><p>Admins review documents, approve doctors, reject applications, and monitor activity.</p></article>
+    </section>
+  </main>
+</body>
+</html>

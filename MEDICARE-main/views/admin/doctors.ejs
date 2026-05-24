@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= pageTitle %> | MediCare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+  <link rel="stylesheet" href="/css/admin-ui.css">
+</head>
+<body class="admin-body">
+  <%
+    const formatDate = (value) => value ? new Date(value).toLocaleDateString() : 'N/A';
+    const formatMoney = (value) => `INR ${Number(value || 0).toLocaleString('en-IN')}`;
+    const statusLabel = status.charAt(0).toUpperCase() + status.slice(1);
+  %>
+  <div class="app-shell admin-shell">
+    <%- include('../partials/sidebar', { activePage: status, sidebarTitle: 'MediCare Admin', sidebarRole: 'admin' }) %>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <h1 class="admin-title"><%= pageTitle %></h1>
+          <p class="admin-subtitle">Review doctors, documents, credentials, and appointment activity.</p>
+        </div>
+        <a class="btn btn-soft" href="/admin/dashboard?view=doctors">Back to Doctor Data</a>
+      </div>
+
+      <%- include('../partials/flash') %>
+
+      <div class="admin-action-row">
+        <a class="btn <%= status === 'pending' ? 'btn-primary' : 'btn-soft' %>" href="/admin/doctors/pending">Pending</a>
+        <a class="btn <%= status === 'approved' ? 'btn-primary' : 'btn-soft' %>" href="/admin/doctors/approved">Approved</a>
+        <a class="btn <%= status === 'rejected' ? 'btn-primary' : 'btn-soft' %>" href="/admin/doctors/rejected">Rejected</a>
+        <a class="btn btn-soft" href="/admin/doctors/history">History</a>
+      </div>
+
+      <section class="admin-panel">
+        <div class="admin-panel-header">
+          <div>
+            <h2><%= statusLabel %> Doctors</h2>
+            <p><%= doctors.length %> doctor record<%= doctors.length === 1 ? '' : 's' %> in this view.</p>
+          </div>
+          <input id="doctorSearch" class="form-control admin-search" type="search" placeholder="Search doctors">
+        </div>
+
+        <div class="table-responsive">
+          <table class="table admin-table align-middle" id="doctorTable">
+            <thead>
+              <tr>
+                <th>Doctor</th>
+                <th>Contact</th>
+                <th>Qualification</th>
+                <th>Verification</th>
+                <th>Status</th>
+                <th>Registered</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (!doctors.length) { %>
+                <tr><td class="admin-empty" colspan="7">No <%= status %> doctors found.</td></tr>
+              <% } %>
+              <% doctors.forEach(function(doctor) { %>
+                <tr>
+                  <td>
+                    <div class="admin-doctor-summary">
+                      <img class="admin-photo" src="<%= doctor.image %>" alt="<%= doctor.name %>">
+                      <div>
+                        <h3>Dr. <%= doctor.name %></h3>
+                        <p><%= doctor.specialization %></p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <strong><%= doctor.email %></strong>
+                    <p class="admin-small"><%= doctor.phone %></p>
+                  </td>
+                  <td>
+                    <strong><%= doctor.degree %></strong>
+                    <p class="admin-small"><%= doctor.experience %> years | <%= formatMoney(doctor.price) %>/min</p>
+                  </td>
+                  <td>
+                    <p class="admin-small"><strong>Aadhaar:</strong> <%= doctor.aadhar %></p>
+                    <p class="admin-small"><strong>License:</strong> <%= doctor.medicalLicense %></p>
+                    <div class="admin-actions mt-2">
+                      <a class="btn btn-soft btn-sm" href="<%= doctor.document %>" target="_blank">Document</a>
+                      <% if (doctor.certificates && doctor.certificates.length) { %>
+                        <% doctor.certificates.forEach(function(file, index) { %>
+                          <a class="btn btn-soft btn-sm" href="<%= file %>" target="_blank">Cert <%= index + 1 %></a>
+                        <% }) %>
+                      <% } %>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="admin-chip chip-<%= doctor.status || 'pending' %>"><%= doctor.status || 'pending' %></span>
+                    <% if (doctor.rejectionReason) { %>
+                      <p class="admin-small mt-2"><%= doctor.rejectionReason %></p>
+                    <% } %>
+                  </td>
+                  <td><%= formatDate(doctor.createdAt) %></td>
+                  <td>
+                    <div class="admin-actions">
+                      <a class="btn btn-soft btn-sm" href="/admin/doctors/<%= doctor._id %>/appointments">Appointments</a>
+                      <% if (status === 'pending') { %>
+                        <form method="POST" action="/admin/approve/<%= doctor._id %>">
+                          <button class="btn btn-success btn-sm" type="submit">Approve</button>
+                        </form>
+                        <a class="btn btn-danger btn-sm" href="/admin/reject/<%= doctor._id %>">Reject</a>
+                      <% } %>
+                      <form method="POST" action="/admin/doctors/<%= doctor._id %>/delete" onsubmit="return confirm('Remove this doctor from MediCare? This will be stored in doctor history.');">
+                        <button class="btn btn-outline-danger btn-sm" type="submit">Remove</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center p-3 border-top">
+          <span id="pageInfo" class="admin-small"></span>
+          <div class="btn-group">
+            <button id="prevPage" class="btn btn-soft btn-sm" type="button">Previous</button>
+            <button id="nextPage" class="btn btn-soft btn-sm" type="button">Next</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('doctorSearch');
+    const rows = Array.from(document.querySelectorAll('#doctorTable tbody tr'));
+    const pageInfo = document.getElementById('pageInfo');
+    const prevPage = document.getElementById('prevPage');
+    const nextPage = document.getElementById('nextPage');
+    const pageSize = 8;
+    let page = 1;
+
+    function filteredRows() {
+      const query = searchInput.value.toLowerCase().trim();
+      return rows.filter((row) => row.innerText.toLowerCase().includes(query));
+    }
+
+    function renderTable() {
+      const visibleRows = filteredRows();
+      const totalPages = Math.max(1, Math.ceil(visibleRows.length / pageSize));
+      page = Math.min(page, totalPages);
+      rows.forEach((row) => row.style.display = 'none');
+      visibleRows.slice((page - 1) * pageSize, page * pageSize).forEach((row) => row.style.display = '');
+      pageInfo.textContent = `${visibleRows.length} doctors | Page ${page} of ${totalPages}`;
+      prevPage.disabled = page === 1;
+      nextPage.disabled = page === totalPages;
+    }
+
+    searchInput.addEventListener('input', () => { page = 1; renderTable(); });
+    prevPage.addEventListener('click', () => { page -= 1; renderTable(); });
+    nextPage.addEventListener('click', () => { page += 1; renderTable(); });
+    renderTable();
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | MediCare</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/medicare-ui.css">
+  <link rel="stylesheet" href="/css/admin-ui.css">
+</head>
+<body class="admin-body">
+  <main class="admin-login-shell">
+    <section class="admin-login-card">
+      <h1>MediCare Admin</h1>
+      <p class="mb-4">Review doctors, patient activity, payments, and platform history.</p>
+      <%- include('../partials/flash') %>
+      <form method="POST" action="/admin/login">
+        <label class="form-label">Email</label>
+        <input class="form-control mb-3" type="email" name="email" required>
+        <label class="form-label">Password</label>
+        <input class="form-control mb-4" type="password" name="password" required>
+        <button class="btn btn-primary w-100" type="submit">Login</button>
+      </form>
+    </section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
