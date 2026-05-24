@@ -38,12 +38,18 @@ app.use((req, res, next) => {
 });
 
 app.use(async (req, res, next) => {
-  const dbFreeRoutes = new Set([
+  const dbFreeAnyMethodRoutes = new Set([
+    '/api/doctors',
+    '/admin/login',
+    '/chat',
+    '/test'
+  ]);
+
+  const dbFreeGetRoutes = new Set([
     '/',
     '/appointment',
     '/appointments',
     '/find-doctors',
-    '/api/doctors',
     '/admin/login',
     '/login',
     '/signup',
@@ -51,10 +57,14 @@ app.use(async (req, res, next) => {
     '/doctor/register',
     '/contact',
     '/services',
-    '/about'
+    '/about',
+    '/donate',
+    '/logout',
+    '/doctor/logout',
+    '/admin/logout'
   ]);
 
-  if (dbFreeRoutes.has(req.path)) {
+  if (dbFreeAnyMethodRoutes.has(req.path) || (req.method === 'GET' && dbFreeGetRoutes.has(req.path))) {
     return next();
   }
 
