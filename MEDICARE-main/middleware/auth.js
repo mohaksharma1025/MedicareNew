@@ -1,5 +1,7 @@
+const { isAdminRequest } = require('../utils/adminSession');
+
 function isAdmin(req, res, next) {
-  if (req.session.isAdmin) return next();
+  if (isAdminRequest(req)) return next();
   req.flash('error', 'Please login as admin to continue.');
   return res.redirect('/admin/login');
 }

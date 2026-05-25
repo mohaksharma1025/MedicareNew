@@ -6,6 +6,11 @@ const {
   sendDoctorApproval,
   sendDoctorRejection
 } = require('../services/emailService');
+const {
+  isAdminRequest,
+  setAdminCookie,
+  clearAdminCookie
+} = require('../utils/adminSession');
 
 const pendingDoctorQuery = {
   $or: [
@@ -151,14 +156,23 @@ function buildDoctorHistoryRows(historyEvents, rejectedDoctors) {
 }
 
 function showLogin(req, res) {
-  if (req.session.isAdmin) return res.redirect('/admin/dashboard');
+  if (isAdminRequest(req)) return res.redirect('/admin/dashboard');
   return res.render('admin/login');
 }
 
 function login(req, res) {
   const { email, password } = req.body;
-  if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+  const configuredEmail = process.env.ADMIN_EMAIL;
+  const configuredPassword = process.env.ADMIN_PASSWORD;
+
+  if (!configuredEmail || !configuredPassword) {
+    req.flash('error', 'Admin credentials are not configured in environment variables.');
+    return res.redirect('/admin/login');
+  }
+
+  if (String(email || '').trim().toLowerCase() === configuredEmail.toLowerCase() && password === configuredPassword) {
     req.session.isAdmin = true;
+    setAdminCookie(res);
     req.flash('success', 'Welcome back, admin.');
     return res.redirect('/admin/dashboard');
   }
@@ -169,6 +183,7 @@ function login(req, res) {
 
 function logout(req, res) {
   req.session.isAdmin = false;
+  clearAdminCookie(res);
   req.flash('success', 'Admin logged out successfully.');
   res.redirect('/admin/login');
 }
