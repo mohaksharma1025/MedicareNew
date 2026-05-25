@@ -43,7 +43,7 @@
             </div>
             <div class="col-md-4">
               <label class="form-label">Date</label>
-              <input class="form-control" type="date" name="appointmentDate" required>
+              <input class="form-control" type="date" name="appointmentDate" min="<%= todayDateOnly() %>" required>
             </div>
             <div class="col-md-4">
               <label class="form-label">Time</label>

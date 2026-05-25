@@ -6,6 +6,11 @@ const path = require('path');
 const connectDB = require('./config/db');
 const flashMiddleware = require('./middleware/flash');
 const { isAdminRequest } = require('./utils/adminSession');
+const {
+  formatDateOnly,
+  formatDateTime,
+  todayDateOnly
+} = require('./utils/dateFormat');
 
 const pageRoutes = require('./routes/pageRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -35,6 +40,9 @@ app.use((req, res, next) => {
   res.locals.currentUser = req.session.user || null;
   res.locals.currentDoctor = req.session.doctor || null;
   res.locals.isAdmin = isAdminRequest(req);
+  res.locals.formatDateOnly = formatDateOnly;
+  res.locals.formatDateTime = formatDateTime;
+  res.locals.todayDateOnly = todayDateOnly;
   next();
 });
 

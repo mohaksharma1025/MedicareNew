@@ -2,6 +2,7 @@ const Appointment = require('../models/Appointment');
 const Doctor = require('../models/Doctor');
 const connectDB = require('../config/db');
 const { getRazorpayClient } = require('../services/razorpayService');
+const { isPastDateOnly, normalizeDateOnly } = require('../utils/dateFormat');
 
 async function listDoctors(req, res, next) {
   return res.render('appointmentpage', { doctors: [], directoryError: null });
@@ -60,6 +61,17 @@ async function bookAppointment(req, res, next) {
       appointmentTime,
       appointmentNumber
     } = req.body;
+    const normalizedAppointmentDate = normalizeDateOnly(appointmentDate);
+
+    if (!normalizedAppointmentDate) {
+      req.flash('error', 'Please select a valid appointment date.');
+      return res.redirect(`/book/${doctorId}`);
+    }
+
+    if (isPastDateOnly(normalizedAppointmentDate)) {
+      req.flash('error', 'Please select today or a future appointment date.');
+      return res.redirect(`/book/${doctorId}`);
+    }
 
     const doctor = await Doctor.findOne({ _id: doctorId, status: 'approved' });
     if (!doctor) {
@@ -89,7 +101,7 @@ async function bookAppointment(req, res, next) {
       doctorName: doctor.name,
       doctorEmail: doctor.email,
       doctorSpecialization: doctor.specialization,
-      date: appointmentDate,
+      date: normalizedAppointmentDate,
       time: appointmentTime,
       paymentStatus: 'pending',
       appointmentStatus: 'pending_payment',

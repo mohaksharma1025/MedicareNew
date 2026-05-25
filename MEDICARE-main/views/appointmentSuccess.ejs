@@ -19,7 +19,7 @@
     <% if (appointment) { %>
       <div class="text-start bg-light p-3 rounded mb-3">
         <p class="mb-1"><strong>Doctor:</strong> Dr. <%= appointment.doctorName %></p>
-        <p class="mb-1"><strong>Date:</strong> <%= appointment.date %></p>
+        <p class="mb-1"><strong>Date:</strong> <%= formatDateOnly(appointment.date) %></p>
         <p class="mb-1"><strong>Time:</strong> <%= appointment.time %></p>
         <p class="mb-1"><strong>Meeting Link:</strong> <a href="<%= appointment.meetingLink %>" target="_blank"><%= appointment.meetingLink || 'N/A' %></a></p>
         <p class="mb-1"><strong>Receipt:</strong> <%= appointment.receiptNumber || 'N/A' %></p>

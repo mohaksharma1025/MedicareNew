@@ -37,12 +37,12 @@
       <tr><td>Patient Phone</td><td><%= appointment.patientPhone || 'N/A' %></td></tr>
       <tr><td>Doctor</td><td>Dr. <%= appointment.doctorName %></td></tr>
       <tr><td>Speciality</td><td><%= appointment.doctorSpecialization || 'See doctor profile' %></td></tr>
-      <tr><td>Appointment Date / Time</td><td><%= appointment.date %> at <%= appointment.time %></td></tr>
+      <tr><td>Appointment Date / Time</td><td><%= formatDateOnly(appointment.date) %> at <%= appointment.time %></td></tr>
       <tr><td>Meeting Link</td><td><a href="<%= appointment.meetingLink %>"><%= appointment.meetingLink || 'N/A' %></a></td></tr>
       <tr><td>Amount Paid</td><td>INR <%= appointment.amount || 0 %></td></tr>
       <tr><td>Payment ID</td><td><%= appointment.paymentId || 'N/A' %></td></tr>
       <tr><td>Order ID</td><td><%= appointment.orderId || 'N/A' %></td></tr>
-      <tr><td>Paid At</td><td><%= appointment.paidAt ? appointment.paidAt.toLocaleString() : 'N/A' %></td></tr>
+      <tr><td>Paid At</td><td><%= formatDateTime(appointment.paidAt) %></td></tr>
     </table>
   </section>
 

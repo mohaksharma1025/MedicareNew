@@ -29,7 +29,7 @@
       <h1>Prescription Sheet</h1>
       <p><strong>Doctor:</strong> Dr. <%= doctor.name %></p>
       <p><strong>Patient:</strong> <%= appointment.patientName %> | <%= appointment.patientEmail %> | <%= appointment.patientPhone || 'N/A' %></p>
-      <p><strong>Appointment:</strong> <%= appointment.date %> at <%= appointment.time %></p>
+      <p><strong>Appointment:</strong> <%= formatDateOnly(appointment.date) %> at <%= appointment.time %></p>
       <p><strong>Booking ID:</strong> <%= appointment._id %></p>
       <p><strong>Payment ID:</strong> <%= appointment.paymentId || 'N/A' %></p>
       <p><strong>Receipt:</strong> <%= appointment.receiptNumber || 'N/A' %></p>

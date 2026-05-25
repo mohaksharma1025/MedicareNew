@@ -192,7 +192,7 @@
                     <td>
                       <% if (row.latestAppointment) { %>
                         <strong>Dr. <%= row.latestAppointment.doctorName %></strong>
-                        <p class="admin-small"><%= row.latestAppointment.date %> at <%= row.latestAppointment.time %></p>
+                        <p class="admin-small"><%= formatDateOnly(row.latestAppointment.date) %> at <%= row.latestAppointment.time %></p>
                       <% } else { %>
                         <span class="admin-small">No appointments</span>
                       <% } %>
@@ -234,7 +234,7 @@
                       <p class="admin-small"><%= appointment.patientEmail %></p>
                     </td>
                     <td>Dr. <%= appointment.doctorName %></td>
-                    <td><%= appointment.date %> at <%= appointment.time %></td>
+                    <td><%= formatDateOnly(appointment.date) %> at <%= appointment.time %></td>
                     <td><span class="admin-chip chip-<%= appointment.paymentStatus %>"><%= appointment.paymentStatus %></span></td>
                     <td><span class="admin-chip chip-<%= appointment.appointmentStatus %>"><%= appointment.appointmentStatus %></span></td>
                     <td><%= appointment.amount ? formatMoney(appointment.amount) : 'N/A' %></td>

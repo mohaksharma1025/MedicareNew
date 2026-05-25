@@ -443,6 +443,7 @@
                 <th>Amount</th>
                 <th>Payment ID</th>
                 <th>Order ID</th>
+                <th>Meeting</th>
                 <th>Booked At</th>
                 <th>Prescription</th>
               </tr>
@@ -450,7 +451,7 @@
             <tbody>
               <% if (!appointments.length) { %>
                 <tr data-payment="">
-                  <td colspan="10" class="empty">No patient appointments yet.</td>
+                  <td colspan="12" class="empty">No patient appointments yet.</td>
                 </tr>
               <% } %>
 
@@ -464,7 +465,7 @@
                     <strong>Email:</strong> <%= appointment.patientEmail %><br>
                     <strong>Phone:</strong> <%= appointment.patientPhone || 'N/A' %>
                   </td>
-                  <td><%= appointment.date %></td>
+                  <td><%= formatDateOnly(appointment.date) %></td>
                   <td><%= appointment.time %></td>
                   <td>
                     <span class="badge badge-<%= appointment.appointmentStatus %>"><%= appointment.appointmentStatus %></span>
@@ -475,7 +476,14 @@
                   <td><%= appointment.amount ? `INR ${appointment.amount}` : 'N/A' %></td>
                   <td><%= appointment.paymentId || 'N/A' %></td>
                   <td><%= appointment.orderId || 'N/A' %></td>
-                  <td><%= appointment.createdAt ? appointment.createdAt.toLocaleString() : 'N/A' %></td>
+                  <td>
+                    <% if (appointment.meetingLink && appointment.paymentStatus === 'paid') { %>
+                      <a class="doc-link" href="<%= appointment.meetingLink %>" target="_blank">Join Meeting</a>
+                    <% } else { %>
+                      <span style="color:#60777d;">Available after payment</span>
+                    <% } %>
+                  </td>
+                  <td><%= formatDateTime(appointment.createdAt) %></td>
                   <td>
                     <a class="doc-link" href="/doctor/appointments/<%= appointment._id %>/prescription">
                       <%= appointment.prescription && appointment.prescription.updatedAt ? 'Edit Prescription' : 'Add Prescription' %>

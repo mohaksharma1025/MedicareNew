@@ -27,7 +27,7 @@
       <h1>Booking Details</h1>
       <div class="grid">
         <div class="item"><span>Doctor</span>Dr. <%= appointment.doctorName %></div>
-        <div class="item"><span>Date / Time</span><%= appointment.date %> at <%= appointment.time %></div>
+        <div class="item"><span>Date / Time</span><%= formatDateOnly(appointment.date) %> at <%= appointment.time %></div>
         <div class="item"><span>Patient</span><%= appointment.patientName %></div>
         <div class="item"><span>Payment</span><%= appointment.paymentStatus %> | <%= appointment.paymentId || 'N/A' %></div>
         <div class="item"><span>Booking ID</span><%= appointment._id %></div>
@@ -44,7 +44,7 @@
       <% if (appointment.prescription && appointment.prescription.updatedAt) { %>
         <p><strong>Diagnosis:</strong> <%= appointment.prescription.diagnosis || 'N/A' %></p>
         <p><strong>Notes:</strong> <%= appointment.prescription.notes || 'N/A' %></p>
-        <p><strong>Updated:</strong> <%= appointment.prescription.updatedAt.toLocaleString() %></p>
+        <p><strong>Updated:</strong> <%= formatDateTime(appointment.prescription.updatedAt) %></p>
         <table>
           <thead>
             <tr>

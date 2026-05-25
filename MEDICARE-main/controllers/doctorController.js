@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const Doctor = require('../models/Doctor');
 const Appointment = require('../models/Appointment');
 const { uploadFile } = require('../utils/uploadFile');
+const { buildMeetingLink, buildReceiptNumber } = require('../utils/meeting');
 const {
   sendDoctorRegistrationPending
 } = require('../services/emailService');
@@ -41,6 +42,23 @@ async function showDashboard(req, res, next) {
         { doctorEmail: doctor.email }
       ]
     }).sort({ createdAt: -1 });
+
+    await Promise.all(appointments.map(async (appointment) => {
+      if (appointment.paymentStatus !== 'paid') return;
+      let changed = false;
+
+      if (!appointment.receiptNumber) {
+        appointment.receiptNumber = buildReceiptNumber(appointment);
+        changed = true;
+      }
+
+      if (!appointment.meetingLink) {
+        appointment.meetingLink = buildMeetingLink(appointment);
+        changed = true;
+      }
+
+      if (changed) await appointment.save();
+    }));
 
     const stats = {
       totalAppointments: appointments.length,

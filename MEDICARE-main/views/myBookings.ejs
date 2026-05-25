@@ -60,7 +60,7 @@
             <% appointments.forEach(function(appointment) { %>
               <tr>
                 <td>Dr. <%= appointment.doctorName %></td>
-                <td><%= appointment.date %><br><%= appointment.time %></td>
+                <td><%= formatDateOnly(appointment.date) %><br><%= appointment.time %></td>
                 <td><span class="badge <%= appointment.appointmentStatus %>"><%= appointment.appointmentStatus %></span></td>
                 <td><span class="badge <%= appointment.paymentStatus %>"><%= appointment.paymentStatus %></span><br><%= appointment.paymentId || '' %></td>
                 <td>
@@ -73,7 +73,7 @@
                 <td>
                   <% if (appointment.prescription && appointment.prescription.updatedAt) { %>
                     <strong style="color:#166534;">Available</strong><br>
-                    <small>Updated <%= appointment.prescription.updatedAt.toLocaleString() %></small>
+                    <small>Updated <%= formatDateTime(appointment.prescription.updatedAt) %></small>
                   <% } else { %>
                     Not added yet
                   <% } %>

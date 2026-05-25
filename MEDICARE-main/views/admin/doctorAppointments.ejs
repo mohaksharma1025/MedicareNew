@@ -82,7 +82,7 @@
                     <p class="admin-small"><%= appointment.patientEmail %></p>
                   </td>
                   <td><%= appointment.patientPhone || 'N/A' %></td>
-                  <td><%= appointment.date %> at <%= appointment.time %></td>
+                  <td><%= formatDateOnly(appointment.date) %> at <%= appointment.time %></td>
                   <td><span class="admin-chip chip-<%= appointment.paymentStatus %>"><%= appointment.paymentStatus %></span></td>
                   <td><span class="admin-chip chip-<%= appointment.appointmentStatus %>"><%= appointment.appointmentStatus %></span></td>
                   <td><%= appointment.amount ? formatMoney(appointment.amount) : 'N/A' %></td>
